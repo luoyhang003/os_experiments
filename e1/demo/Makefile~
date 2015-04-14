@@ -1,0 +1,5 @@
+head = pctl.h
+srcs = pctl.c
+objs = pctl.o
+opts = -g -c
+all:	
