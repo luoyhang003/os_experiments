@@ -11,7 +11,7 @@ int main(int argc, char *argv[])
 	int i;
 	int pid;
 	int status;
-	char *args[] = {"/bin/ls", "-a", NULL};
+        char *args[] = {"/bin/ls", "-a", NULL};
 	signal(SIGINT,(sighandler_t)sigcat);
 	pid = fork();
 	if(pid<0)

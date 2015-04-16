@@ -7,3 +7,66 @@
 */
 
 #include "pctl.h"
+
+int main(int argc, char *argv[])
+{
+	int i;
+	int pid_1, pid_2;
+	int status_ls, status_ps;
+	char *args_ls[] = {"/bin/ls", "-a", NULL};
+	char *args_ps[] = {"/bin/ps", "-l" ,NULL};
+	signal(SIGINT,(sighandler_t)sigcat);
+
+	while(1){
+		if((pid_1=fork())==0){
+			pause();
+			printf("CHILD 1_ps: RUNNING\n");
+			printf("CHILD 1_ps: My pid is %d\n",getpid());
+			printf("CHILD 1_ps: My father's pid is %d\n",getppid());
+			status_ps = execve(args_ps[0],args_ps,NULL);
+		}
+		else{
+			pid_2 = fork();
+			if(pid_2 < 0){
+				printf("Create ps Fail!\n");
+				exit(EXIT_FAILURE);
+			}
+			else if(pid_2 == 0){
+				pause();
+				printf("CHILD 2_ls: RUNNING\n");
+				printf("CHILD 2_ls: My pid is %d\n",getpid());
+				printf("CHILD 2_ls: My father's pid is %d\n",getppid());
+				status_ps = execve(args_ls[0],args_ls, NULL);
+			}
+			else{
+				printf("FATHER: RUNNING\n");
+				printf("FATHER: My pid is: %d", getpid());
+
+				if(kill(pid_1,SIGINT)>=0){
+					waitpid(pid_1, &status_ls,0);
+					sleep(3);
+					printf("FATHER: CHILD ps finished\n");
+					if(kill(pid_2, SIGINT)>=0){
+						waitpid(pid_2, &status_ls,0);
+						printf("FATHER: CHILD ls finished.\n");
+					}
+				}
+			}
+		}
+	}
+	return EXIT_SUCCESS;
+	
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
